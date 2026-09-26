@@ -7,6 +7,7 @@
 
 use super::config::*;
 use super::program::*;
+use crate::error;
 use crate::hardware::common::memory::DualPortMemStat;
 use crate::hardware::common::{DualPortMem, Register, Stack};
 use crate::hardware::utils::fire;
@@ -1263,7 +1264,7 @@ impl DrfHeap {
 }
 
 impl HwModule for DrfHeap {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         self.update_prepare();
         self.gc_read_granted.connect(&false);
 

@@ -1,3 +1,4 @@
+use crate::error;
 use crate::hardware::common::Register;
 use crate::hw_module::{HwInput, HwModule};
 
@@ -63,13 +64,13 @@ impl<T: Clone + Default, const N: usize> RArbiter<T, N> {
 }
 
 impl<T: Clone + Default, const N: usize> HwModule for RArbiter<T, N> {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         self.select()
             .map(|p| self.priority.connect(&((p + 1) % N)))
             .ok_or("Could not select in RArbiter".to_string())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         self.priority.tick()
     }
 }
@@ -120,10 +121,10 @@ impl<T: Clone + Default, const N: usize> PArbiter<T, N> {
 
 impl<T: Clone + Default, const N: usize> HwModule for PArbiter<T, N> {
     // no local states to update
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         Ok(())
     }
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         Ok(())
     }
 }

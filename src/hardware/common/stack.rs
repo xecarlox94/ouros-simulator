@@ -1,6 +1,8 @@
 use crate::hw_module::{HwInput, HwModule};
 use vstd::prelude::*;
 
+use crate::error;
+
 verus! {
 #[derive(Default, Debug, PartialEq)]
 pub enum StackOp {
@@ -77,7 +79,7 @@ impl<T: Clone + Default, const N: usize> Stack<T, N> {
 }
 
 impl<T: Clone + Default, const N: usize> HwModule for Stack<T, N> {
-    fn update_local(&mut self) -> Result<(), String>
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw>
     ensures
     self.input.op is NOP ==> self.mem == old(self).mem,
     self.input.op is PUSH ==> self.mem@.len() > old(self).mem@.len(),
@@ -100,7 +102,7 @@ impl<T: Clone + Default, const N: usize> HwModule for Stack<T, N> {
             Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {Ok(())}
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {Ok(())}
 }
 
     fn push(vec: &mut Vec<bool>, b: bool)

@@ -1,4 +1,7 @@
-use crate::hw_module::{HwInput, HwModule};
+use crate::{
+    error,
+    hw_module::{HwInput, HwModule},
+};
 
 #[derive(Default)]
 pub struct MemInput<T: Clone + Default> {
@@ -56,7 +59,7 @@ impl<T: Default + Clone> SinglePortMem<T> {
 }
 
 impl<T: Default + Clone> HwModule for SinglePortMem<T> {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         if self.input.enable {
             if self.input.is_write {
                 // FIX: fix this possible exception
@@ -69,7 +72,7 @@ impl<T: Default + Clone> HwModule for SinglePortMem<T> {
         Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         Ok(())
     }
 }
@@ -185,7 +188,7 @@ impl<T: Clone + Default> DualPortMem<T> {
 }
 
 impl<T: Clone + Default> HwModule for DualPortMem<T> {
-    fn update_stat(&mut self) -> std::result::Result<(), std::string::String> {
+    fn update_stat(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         Ok(if self.record_stat {
             if self.input.port_a.enable {
                 if self.input.port_a.is_write {
@@ -205,7 +208,7 @@ impl<T: Clone + Default> HwModule for DualPortMem<T> {
         })
     }
 
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         assert!(
             !(self.input.port_a.is_write
                 && self.input.port_b.is_write
@@ -234,7 +237,7 @@ impl<T: Clone + Default> HwModule for DualPortMem<T> {
         Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         Ok(())
     }
 }

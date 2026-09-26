@@ -31,12 +31,6 @@ pub enum SimulationMode {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum Simulation {
-    #[error("Some shite: {0}")]
-    StringError(String)
-}
-
-#[derive(Debug, thiserror::Error)]
 pub enum GarbageCollectorMode {
     #[error("Initialising IO: {0}")]
     InitIO(std::io::Error),
@@ -70,4 +64,44 @@ pub fn report_ouros(e: Ouros) {
     dbg!(&e);
     // TODO: yet to report it properly
     // match e {}
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum Simulation {
+    #[error("Excedeed cycle limit of {0}")]
+    CycleLimit(u32),
+
+    #[error("Ticking hardware: {0}")]
+    Tick(#[from] sim::TickHw),
+}
+
+pub mod sim {
+
+    #[derive(Debug, thiserror::Error)]
+    pub enum TickHw {
+        #[error("Tick leafs: {0}")]
+        TickLeafs(String),
+        #[error("Local: {0}")]
+        Local(String),
+        #[error("Stat: {0}")]
+        Stat(String),
+        #[error("Root: ({origin_error}) {rec}")]
+        Rec {
+            rec: Box<TickHw>,
+            origin_error: String,
+        },
+    }
+
+    /// This is the snaphot of the state of the App_State that we are running
+    #[derive(Debug, Copy, Clone)]
+    struct State;
+
+    impl TickHw {
+        /// just to ensure that we always return a state
+        fn get_state(&self) -> State {
+            match self {
+                TickHw::DELETE_ME(state) => *state,
+            }
+        }
+    }
 }

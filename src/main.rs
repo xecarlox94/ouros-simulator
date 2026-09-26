@@ -21,6 +21,8 @@ use hardware::ouros::program::{ActiveApp, App, Program, app_length};
 use hardware::ouros::benchmarks::{self, *};
 use hw_module::HwModule;
 
+const CYCLE_LIMIT: u32 = 1_000_000_000;
+
 fn simulate(
     prog: &Program,
     detail_lv: u8,
@@ -31,23 +33,21 @@ fn simulate(
     let mut ouros = OurosCore::new(prog, detail_lv, heap_size, gc_at);
     let mut cycle: u32 = 0;
 
-    ouros.tick().map_err(error::Simulation::StringError)?;
+    ouros.tick()?;
 
     // kick start the machine
     ouros.input.start = true;
-    ouros.tick().map_err(error::Simulation::StringError)?;
+    ouros.tick()?;
     ouros.input.start = false;
 
     loop {
-        if cycle >= 1_000_000_000 {
-            return Err(error::Simulation::StringError(
-                "exceeded cycle limit".to_string(),
-            ));
+        if cycle >= CYCLE_LIMIT {
+            return Err(error::Simulation::CycleLimit(CYCLE_LIMIT));
         }
         if ouros.done() || cycle == 900_000_000 {
             break;
         }
-        ouros.tick().map_err(error::Simulation::StringError)?;
+        ouros.tick()?;
         cycle += 1;
     }
 

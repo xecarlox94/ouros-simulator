@@ -1,4 +1,5 @@
 use super::config::{CONSUMERS, CONSUMERS_DHEAP, CONSUMERS_REDUCER};
+use crate::error;
 use crate::hardware::common::Register;
 use crate::hw_module::{HwInput, HwModule};
 
@@ -104,7 +105,7 @@ impl AddrBox {
 }
 
 impl HwModule for AddrBox {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         // ============ handle free addrs ===========
         for i in 0..CONSUMERS {
             // reg value shifting
@@ -146,7 +147,7 @@ impl HwModule for AddrBox {
         Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         for reg in self.addr_regs.iter_mut() {
             reg.tick()?
         }

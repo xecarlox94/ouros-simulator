@@ -1,3 +1,4 @@
+use crate::error;
 use crate::hardware::utils::fire;
 use crate::hw_module::{HwInput, HwModule};
 
@@ -52,7 +53,7 @@ impl<T: Clone + Default + PartialEq, const N: usize> Ring<T, N> {
 }
 
 impl<T: Clone + Default + PartialEq, const N: usize> HwModule for Ring<T, N> {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         if self.input.out_fire {
             self.reg_bank[*self.head.value()] = (false, Default::default());
             self.head.connect(&((*self.head.value() + 1) % N));
@@ -64,7 +65,7 @@ impl<T: Clone + Default + PartialEq, const N: usize> HwModule for Ring<T, N> {
         Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         self.head.tick()?;
         self.tail.tick()
     }

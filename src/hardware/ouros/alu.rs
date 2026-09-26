@@ -6,6 +6,7 @@
 
 use super::program::AluOp::*;
 use super::program::Atom::*;
+use crate::error;
 use crate::{
     hardware::{
         ouros::{
@@ -163,7 +164,7 @@ impl Alu {
 }
 
 impl HwModule for Alu {
-    fn update_local(&mut self) -> Result<(), String> {
+    fn update_local(&mut self) -> Result<(), error::sim::TickHw> {
         if fire(self.holder.0, self.input.output_ready) {
             self.holder.0 = false;
         }
@@ -175,7 +176,7 @@ impl HwModule for Alu {
         Ok(())
     }
 
-    fn update_stat(&mut self) -> std::result::Result<(), std::string::String> {
+    fn update_stat(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         if self.input_fire() {
             self.stat.reductions += 1;
         }
@@ -199,7 +200,7 @@ impl HwModule for Alu {
         Ok(())
     }
 
-    fn tick_children(&mut self) -> std::result::Result<(), std::string::String> {
+    fn tick_children(&mut self) -> std::result::Result<(), error::sim::TickHw> {
         Ok(())
     }
 }
